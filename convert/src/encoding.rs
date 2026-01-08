@@ -163,10 +163,10 @@ impl<T: Default + protobuf::Message> FromBytesOwned for Protobuf<T> {
 
 /// Raw does no conversion, it just copies the memory directly.
 /// Note: This will only work for types that implement [bytemuck::Pod](https://docs.rs/bytemuck/latest/bytemuck/trait.Pod.html)
-#[cfg(all(feature = "raw", target_endian = "little"))]
+#[cfg(all(feature = "raw"))]
 pub struct Raw<'a, T: bytemuck::Pod>(pub &'a T);
 
-#[cfg(all(feature = "raw", target_endian = "little"))]
+#[cfg(all(feature = "raw"))]
 impl<'a, T: bytemuck::Pod> ToBytes<'a> for Raw<'a, T> {
     type Bytes = &'a [u8];
 
@@ -175,13 +175,10 @@ impl<'a, T: bytemuck::Pod> ToBytes<'a> for Raw<'a, T> {
     }
 }
 
-#[cfg(all(feature = "raw", target_endian = "little"))]
+#[cfg(all(feature = "raw"))]
 impl<'a, T: bytemuck::Pod> FromBytes<'a> for Raw<'a, T> {
     fn from_bytes(data: &'a [u8]) -> Result<Self, Error> {
         let x = bytemuck::try_from_bytes(data).map_err(|x| Error::msg(x.to_string()))?;
         Ok(Raw(x))
     }
 }
-
-#[cfg(all(feature = "raw", target_endian = "big"))]
-compile_error!("The raw feature is only supported on little endian targets");
